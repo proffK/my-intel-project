@@ -4,132 +4,153 @@
 #include <string.h>
 #include <math.h>
 #include <locale.h>
+#include <limits.h>
+#include <assert.h>
 
 const int PRIME_SIZE = 2221;
 
-///###########################################################
+const long MAX_FILE_SIZE = LONG_MAX;
 
-int hash1(char** str);
+///#####################################################################
 
-int hash2(char** str);
+long file_length(FILE* input_file, long MAX_FILE_SIZE);
 
-int hash3(char** str);
+char* word_buffer_create(FILE* input_file, long input_file_length);
 
-int hash4(char** str);
+unsigned int hash1(char** str);
+///Sum hash
 
-int hash5(char** str);
+unsigned int hash2(char** str);
+///Mul hash
 
-int hash6(char** str);
+unsigned int hash3(char** str);
+///XOR hash
 
-int hash7(char** str);
+unsigned int hash4(char** str);
+///1 hash
 
-int hashtest(FILE* input_file, FILE* output_file, int (*hash) (char** str));
+unsigned int hash5(char** str);
+///First char hash
 
-///###########################################################
+unsigned int hash6(char** str);
+///Length hash
+
+unsigned int hash7(char** str);
+///FAQ6 hash
+
+
+int hashtest(char* buffer,long buffer_size, FILE* output_file, \
+				unsigned int (*hash) (char** str));
+
+///#####################################################################
 
 int main(){
 	FILE* input_file = 0;
 	FILE* output_file = 0;
+	long buffer_size = 0;
+	char* buffer = 0;
 	
 	input_file = fopen("J. D. Salinger - The Catcher in the Rye - 1951.txt", "r");
-	
 	output_file = fopen("rezult1.cvs", "w");
+	buffer_size = file_length(input_file, MAX_FILE_SIZE);
 	
-	hashtest(input_file, output_file, hash1);
+	buffer = word_buffer_create(input_file, buffer_size);
+	
+	hashtest(buffer, buffer_size, output_file, hash1);
 	
 	output_file = fopen("rezult2.cvs", "w");
 	
-	hashtest(input_file, output_file, hash2);
+	hashtest(buffer, buffer_size, output_file, hash2);
 	
 	output_file = fopen("rezult3.cvs", "w");
 	
-	hashtest(input_file, output_file, hash3);
+	hashtest(buffer, buffer_size, output_file, hash3);
 	
 	output_file = fopen("rezult4.cvs", "w");
 	
-	hashtest(input_file, output_file, hash4);
+	hashtest(buffer, buffer_size, output_file, hash4);
 	
 	output_file = fopen("rezult5.cvs", "w");
 	
-	hashtest(input_file, output_file, hash5);
+	hashtest(buffer, buffer_size, output_file, hash5);
 	
 	output_file = fopen("rezult6.cvs", "w");
 	
-	hashtest(input_file, output_file, hash6);
+	hashtest(buffer, buffer_size, output_file, hash6);
 	
 	output_file = fopen("rezult7.cvs", "w");
 	
-	hashtest(input_file, output_file, hash7);
+	hashtest(buffer, buffer_size, output_file, hash7);
+	 
+	free(buffer);
+	buffer = NULL;
 
 	return 0;
 		
 }
-///###########################################################
-int hash1(char** str){
+///#####################################################################
+unsigned int hash1(char** str){
 	int i = 0;
-	int rezult = 1;
+	unsigned int hash = 1;
+	int max = strlen(*str);
+	
+	for(i = 0; i < max; ++i){
+		
+		hash += (unsigned char) (*str)[i];
+	}
+	
+	return hash;
+}
+///#####################################################################
+unsigned int hash2(char** str){
+	int i = 0;
+	unsigned int hash = 1;
 	int max = strlen(*str);
 	
 	
 	for(i = 0; i < max; ++i){
 		
-		rezult += (*str)[i];
+		hash *= (unsigned char) (*str)[i];
 	}
 	
-	rezult = rezult % 100000;
-	return abs(rezult);
+	return hash;
 }
-///###########################################################
-int hash2(char** str){
+///#####################################################################
+unsigned int hash3(char** str){
 	int i = 0;
-	int rezult = 1;
+	unsigned int hash = 0;
 	int max = strlen(*str);
 	
-	
-	for(i = 0; i < max; ++i){
-		
-		rezult *= (*str)[i];
-	}
-	
-	rezult = rezult % 100000;
-	return abs(rezult);
-}
-///###########################################################
-int hash3(char** str){
-	int i = 0;
-	int rezult = 0;
-	int max = strlen(*str);
-	
-	if (str != NULL) rezult = (*str)[0];
+	if (str != NULL) hash = (unsigned char) (*str)[0];
 	
 	for(i = 1; i < max; ++i){
-		rezult = (rezult << 1) ^ (*str)[i];
+		hash = (hash << 1) ^ (unsigned char) (*str)[i];
 	}
 	
-	return abs(rezult);
+	return hash;
 }
-///###########################################################
-int hash4(char** str){
+///#####################################################################
+unsigned int hash4(char** str){
 	return 1;
 }
-///###########################################################
-int hash5(char** str){
-	return abs((*str)[0]);
+///#####################################################################
+unsigned int hash5(char** str){
+	return (unsigned char) (*str)[0];
 }
-///###########################################################
-int hash6(char** str){
-	return abs(strlen(*str));
+///#####################################################################
+unsigned int hash6(char** str){
+	return strlen(*str);
 }
-///###########################################################
-int hash7(char** str){
+///#####################################################################
+unsigned int hash7(char** str){
 
-    int hash = 0;
+    unsigned int hash = 0;
     
     int i = 0;
     
 	int max = strlen(*str);
 	
-	if (str != NULL) hash = (*str)[0];
+	if (str != NULL) hash = (unsigned char) (*str)[0];
 	
 	for(i = 1; i < max; ++i){
 		hash += (unsigned char) (*str)[i];
@@ -141,30 +162,84 @@ int hash7(char** str){
     hash ^= (hash >> 11);
     hash += (hash << 15);
 
-    return abs(hash);
+    return hash;
 
 }
-///###########################################################
 
-int hashtest(FILE* input_file, FILE* output_file, int (*hash) (char** str)){
-	hash_table* table = 0;
-	int i = 0;
-	char* tempstr = (char*) calloc (100, sizeof(char));
+///#####################################################################
+
+long file_length(FILE* input_file, long MAX_FILE_SIZE){
 	
+	long i = 0;
+	int c = 0;
 	
-	table = hash_table_create(PRIME_SIZE);
+	while((c = fgetc(input_file) != EOF)){
+		
+		if (c == '\0') return 0;
+		++i;
+		
+	}
+	
+	return i;
+}
+
+///#####################################################################
+
+char* word_buffer_create(FILE* input_file,long input_file_length){
+	
+	char* buffer = NULL;
+	int c = 0;
+	
+	assert(input_file);
+	
 	rewind(input_file);
 	
-	fprintf(output_file, "list number , list elements of sort \n");
-
-	while(fscanf(input_file, "%s", tempstr) > 0){
-
-		if (!(hash_table_find(table, hash, &tempstr)))
-			hash_table_add(table, &tempstr, hash);
-
-	}
-
+	buffer = (char*) calloc (input_file_length + 1, sizeof(char));
 	
+	fread(buffer, sizeof(char), input_file_length, input_file);
+	
+	for (c = 0; c < input_file_length; ++c){
+		
+		if (buffer[c] == ' ' || buffer[c] == '\n' || buffer[c] == '\t'){
+			
+			buffer[c] = '\0';
+			
+		}
+		
+	}
+	
+	buffer[input_file_length] = '\0';
+	
+	return buffer;
+}
+
+///#####################################################################
+
+int hashtest(char* buffer, long buffer_size, FILE* output_file, \
+			unsigned int (*hash) (char** str)){
+				
+	hash_table* table = 0;
+	int i = 0;
+	char* tempstr = 0;
+	
+	table = hash_table_create(PRIME_SIZE);
+	
+	fprintf(output_file, "list number , list elements of sort \n");
+	
+	for (i = 0; i < buffer_size - 1; ++i){
+		
+		if	(buffer[i] == '\0'){
+			
+			tempstr = buffer + i + 1;
+			
+			if (!(hash_table_find(table, hash, tempstr))){
+				
+				hash_table_add(table, tempstr, hash);
+			
+			}
+			
+		}	
+	}
 	
 	for (i = 0; i < table -> size; ++i){
 		
@@ -172,8 +247,14 @@ int hashtest(FILE* input_file, FILE* output_file, int (*hash) (char** str)){
 		fprintf(output_file, "%d , %d \n", i,  (table -> data[i]) -> size);
 		
 	}
+	
+	clear_log();
+	
+	hash_table_dump(table);
+	
 	hash_table_delete(table);
+	
+	return 0;
 }
 
 
-"%[^\"]"

@@ -4,8 +4,6 @@
 #include <string.h>
 #include <errno.h>
 
-const int MAX_ELEMENT_SIZE = 100;
-
 const char* LOG_FILE_NAME = "list_log.txt";
 
 list* list_create(void){
@@ -39,23 +37,23 @@ int list_delete(list* deleted_list){
 	
 
 
-list_elem* add_elem(list* lst, elem_t* new_elem, elem_t (*cpy) (elem_t, elem_t)){
+list_elem* add_elem(list* lst, elem_t new_elem){
 	
 	if (list_valide(lst)) {
-	
+		
 	list_elem* new_list_elem = (list_elem*) calloc (1, sizeof(list_elem));
 	
-	new_list_elem -> data = (elem_t) calloc (MAX_ELEMENT_SIZE, sizeof(char));
-	
 	if (new_list_elem == NULL) {
-		
-		errno = ENOMEM;
-		abort();
-		
-	}
+               
+                errno = ENOMEM;
+                abort();
+               
+    }
 	
-	cpy(new_list_elem -> data, *new_elem);
+	new_list_elem -> data = new_elem;
+	
 	if (lst -> size != 0) lst -> head -> next = new_list_elem;
+	
 	new_list_elem -> prev = lst -> head;
 	lst -> head = new_list_elem;
 	
@@ -75,15 +73,12 @@ list_elem* add_elem(list* lst, elem_t* new_elem, elem_t (*cpy) (elem_t, elem_t))
 	return 0;
 }
 
-list_elem* insert_elem(list* lst, elem_t* new_elem, list_elem* next_elem,\
-						elem_t (*cpy) (elem_t, elem_t)){
+list_elem* insert_elem(list* lst, elem_t new_elem, list_elem* next_elem){
 							
 	if (list_valide(lst)) {
 	
 	list_elem* new_list_elem = (list_elem*) calloc (1, sizeof(list_elem));
-	
-	new_list_elem -> data = (elem_t) calloc (MAX_ELEMENT_SIZE, sizeof(char));
-	
+		
 	if (new_list_elem == NULL) {
 		
 		errno = ENOMEM;
@@ -93,7 +88,7 @@ list_elem* insert_elem(list* lst, elem_t* new_elem, list_elem* next_elem,\
 	
 	if (next_elem -> prev == NULL) {
 		
-		cpy(new_list_elem -> data, *new_elem);
+		new_list_elem -> data = new_elem;
 		next_elem -> prev = new_list_elem;
 		new_list_elem -> next = next_elem;
 		lst -> tail = new_list_elem;
@@ -102,7 +97,7 @@ list_elem* insert_elem(list* lst, elem_t* new_elem, list_elem* next_elem,\
 		return new_list_elem;
 	}
 	
-	cpy(new_list_elem -> data, *new_elem);
+	new_list_elem -> data = new_elem;
 	new_list_elem -> prev = next_elem -> prev;
 	next_elem -> prev -> next = new_list_elem;
 	next_elem -> prev = new_list_elem;
@@ -118,7 +113,7 @@ list_elem* insert_elem(list* lst, elem_t* new_elem, list_elem* next_elem,\
 	
 }
 
-list_elem* delete_elem(list* lst, list_elem* deleted_elem){
+int delete_elem(list* lst, list_elem* deleted_elem){
 	
 	if (list_valide(lst) && lst -> size != 0) {
 	
@@ -129,7 +124,7 @@ list_elem* delete_elem(list* lst, list_elem* deleted_elem){
 			lst -> tail = NULL;
 			--lst -> size;
 			
-			free(deleted_elem -> data);
+			free(deleted_elem);
 		}
 		
 		else {
@@ -139,7 +134,8 @@ list_elem* delete_elem(list* lst, list_elem* deleted_elem){
 			
 			deleted_elem -> prev -> next = NULL;
 			deleted_elem -> prev = NULL;
-			free(deleted_elem -> data);
+			
+			free(deleted_elem);
 		}
 	}
 	else if (deleted_elem -> prev == NULL) {
@@ -149,7 +145,7 @@ list_elem* delete_elem(list* lst, list_elem* deleted_elem){
 		
 		deleted_elem -> next -> prev = NULL;
 		deleted_elem -> next = NULL;
-		free(deleted_elem -> data);
+		free(deleted_elem);
 	}
 	else {
 			
@@ -159,7 +155,7 @@ list_elem* delete_elem(list* lst, list_elem* deleted_elem){
 		deleted_elem -> prev -> next = deleted_elem -> next;
 		deleted_elem -> next = NULL;
 		deleted_elem -> prev = NULL;
-		free(deleted_elem -> data);
+		free(deleted_elem);
 		
 	}
 	
@@ -171,7 +167,7 @@ list_elem* delete_elem(list* lst, list_elem* deleted_elem){
 }
 	
 
-list_elem* find_elem(list* lst, elem_t* found_elem, int (*cmp) (elem_t, elem_t)\
+list_elem* find_elem(list* lst, elem_t found_elem, int (*cmp) (elem_t, elem_t)\
 					  , list_elem* current_elem, int direction){
 	
 	if (list_valide(lst)) {
@@ -182,14 +178,21 @@ list_elem* find_elem(list* lst, elem_t* found_elem, int (*cmp) (elem_t, elem_t)\
 	
 		for (i = 0; i < lst -> size; ++i){
 		
-			if (!(cmp(current_elem -> data, *found_elem)))
+			if (!(cmp(current_elem -> data, found_elem))){
+				
 				return current_elem;
+				
+			}
 			
 			if (current_elem -> next == NULL) {
+				
 				current_elem = lst -> tail;
+			
 			}
 			else{
+				
 				current_elem = current_elem -> next;
+			
 			}
 		}
 	}
@@ -198,7 +201,7 @@ list_elem* find_elem(list* lst, elem_t* found_elem, int (*cmp) (elem_t, elem_t)\
 	
 		for (i = 0; i < lst -> size; ++i){
 		
-			if (!(cmp(current_elem -> data, *found_elem)))
+			if (!(cmp(current_elem -> data, found_elem)))
 				return current_elem;
 			
 			if (current_elem -> prev == NULL) {
@@ -208,11 +211,11 @@ list_elem* find_elem(list* lst, elem_t* found_elem, int (*cmp) (elem_t, elem_t)\
 			current_elem = current_elem -> prev;
 			
 		}
+	}
 	
-	return NULL;
 	}
-	return NULL;
-	}
+	
+	return 0;
 }	
 	
 int list_valide(list* lst){

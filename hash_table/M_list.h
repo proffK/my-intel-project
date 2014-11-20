@@ -38,14 +38,13 @@ list* list_create(void);
 
 int list_delete(list* deleted_list);
 
-list_elem* add_elem(list* lst, elem_t* new_elem, elem_t (*cpy) (elem_t, elem_t));
+list_elem* add_elem(list* lst, elem_t new_elem);
 
-list_elem* insert_elem(list* lst, elem_t* new_elem, list_elem* next_elem,\
-						elem_t (*cpy) (elem_t, elem_t));
+list_elem* insert_elem(list* lst, elem_t new_elem, list_elem* next_elem);
 
-list_elem* delete_elem(list* lst, list_elem* deleted_elem);
+int delete_elem(list* lst, list_elem* deleted_elem);
 
-list_elem* find_elem(list* lst, elem_t* found_elem, int (*cmp) (elem_t, elem_t),\
+list_elem* find_elem(list* lst, elem_t found_elem, int (*cmp) (elem_t, elem_t),\
 					  list_elem* current_elem, int direction);
 
 int list_valide(list* lst);
