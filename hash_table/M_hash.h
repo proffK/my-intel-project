@@ -4,13 +4,6 @@
 
 #define DEBUG_HASH
 
-#ifndef DEBUG_HASH
-
-#define hash_table_valide(x) 1
-
-#endif
-
-
 
 typedef struct {
 	
@@ -29,8 +22,6 @@ int hash_table_valide(hash_table* table);
 int hash_table_dump(hash_table* table);
 
 int hash_table_delete(hash_table* table);
-
-int hash_table_find_number(hash_table* table, int (*hash_gen) (elem_t*), elem_t* found_elem);
 
 list_elem* hash_table_find(hash_table* table, int (*hash_gen) (elem_t*), elem_t* found_elem);
 

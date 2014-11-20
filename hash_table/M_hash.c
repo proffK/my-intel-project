@@ -39,18 +39,18 @@ hash_table* hash_table_create(int size){
 	if (hash_table_valide(new_table)) return new_table;
 	
 }
-
+///###########################################################
 int hash_table_add(hash_table* table, elem_t* elem, int (*hash_gen) (elem_t*)){
 	
 	int number_list = 0;
 	
 	if (hash_table_valide(table)) {
 	
-	number_list = hash_gen(elem);
-	number_list = number_list % (table -> size);
+	number_list = hash_gen(elem) % (table -> size);
 		
 	if (add_elem(table -> data[number_list], elem, strcpy)){
 		
+		++table -> number_elem;
 		return number_list;
 	
 	}
@@ -60,8 +60,16 @@ int hash_table_add(hash_table* table, elem_t* elem, int (*hash_gen) (elem_t*)){
 	return -1;
 	
 }
-
+///###########################################################
 int hash_table_valide(hash_table* table){
+	
+	#ifndef DEBUG_HASH
+
+	return 1;
+
+	#endif
+
+	
 	const int OK = 1;
 	const int INVAL = 0;
 	int i = 0;
@@ -107,14 +115,16 @@ int hash_table_valide(hash_table* table){
 	
 	return OK;
 }
-
+///###########################################################
 int hash_table_dump(hash_table* table){
 	int i = 0;
 	
 	for(i = 0; i < table -> size; ++i){
 		
 		if ((list_valide(table -> data[i]))){
-			
+			FILE* file = fopen("list_log.txt", "a");
+			fprintf(file, "\n%d\n", i);
+			fclose(file);
 			list_dump(table -> data[i]);
 		
 		}
@@ -123,7 +133,7 @@ int hash_table_dump(hash_table* table){
 	
 	return 0;
 }
-
+///###########################################################
 int hash_table_delete(hash_table* table){
 	
 	int i = 0;
@@ -144,39 +154,14 @@ int hash_table_delete(hash_table* table){
 	}
 	
 }
-
-int hash_table_find_number(hash_table* table, int (*hash_gen) (elem_t*), elem_t* found_elem){
-	
-	if (hash_table_valide(table)) {
-		int i = 0;
-		int current_list = hash_gen(found_elem);
-		list_elem* current_elem = 0;
-		
-		current_elem = find_elem(table -> data[current_list], found_elem, strcmp,\
-									list_tail(table -> data[current_list]), L_HEAD);
-		
-		if (current_elem) return 0;
-		
-		for(i = 1; current_elem -> next != NULL \
-			&& strcmp(current_elem -> next -> data, current_elem -> data); ++i){
-			
-			current_elem = current_elem -> next;
-			
-		}
-		
-		return i;
-		
-	}
-	
-
-}
+///###########################################################
 
 list_elem* hash_table_find(hash_table* table, int (*hash_gen) (elem_t*), elem_t* found_elem){
 	
 	if (hash_table_valide(table)) {
 		
-		int current_list = hash_gen(found_elem);
-		list_elem* current_elem = 0;
+		list_elem* current_elem = 0;		
+		int current_list = hash_gen(found_elem) % table -> size;
 		
 		current_elem = find_elem(table -> data[current_list], found_elem, strcmp,\
 									list_tail(table -> data[current_list]), L_HEAD);

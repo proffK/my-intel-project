@@ -3,8 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <locale.h>
 
-const int PRIME_SIZE = 761;
+const int PRIME_SIZE = 2221;
+
+///###########################################################
 
 int hash1(char** str);
 
@@ -18,153 +21,50 @@ int hash5(char** str);
 
 int hash6(char** str);
 
+int hash7(char** str);
+
+int hashtest(FILE* input_file, FILE* output_file, int (*hash) (char** str));
+
+///###########################################################
+
 int main(){
 	FILE* input_file = 0;
 	FILE* output_file = 0;
-	char* tempstr = NULL;
-	int i = 0;
-	hash_table* table = hash_table_create(PRIME_SIZE);
 	
-	tempstr = (char*) calloc (100, sizeof(char));
+	input_file = fopen("J. D. Salinger - The Catcher in the Rye - 1951.txt", "r");
 	
-	input_file = fopen("Game_of_thrones.txt", "r");
+	output_file = fopen("rezult1.cvs", "w");
 	
-	output_file = fopen("rezult.cvs", "w");
+	hashtest(input_file, output_file, hash1);
 	
-	while(fscanf(input_file, "%s", tempstr) > 0){
-		
-		hash_table_add(table, &tempstr, hash1);
-		++i;
-	}
+	output_file = fopen("rezult2.cvs", "w");
 	
-	printf("\n%d", i);
+	hashtest(input_file, output_file, hash2);
 	
-	fprintf(output_file, "list number:, ");
+	output_file = fopen("rezult3.cvs", "w");
 	
-	for (i = 0; i < table -> size; ++i){
-		
-		fprintf(output_file, "%d ,", i);
-		
-	}
+	hashtest(input_file, output_file, hash3);
 	
-	fprintf(output_file, "\nlist elements of sort 1 (sum):, ");
+	output_file = fopen("rezult4.cvs", "w");
 	
-	for (i = 0; i < table -> size; ++i){
-		
-		fprintf(output_file, "%d ,", (table -> data[i]) -> size);
-		
-	}
+	hashtest(input_file, output_file, hash4);
 	
-	hash_table_delete(table);
+	output_file = fopen("rezult5.cvs", "w");
 	
-	table = hash_table_create(PRIME_SIZE);
+	hashtest(input_file, output_file, hash5);
 	
-	rewind(input_file);
+	output_file = fopen("rezult6.cvs", "w");
 	
-	while(fscanf(input_file, "%s", tempstr) > 0){
-		
-		hash_table_add(table, &tempstr, hash2);
-		++i;
-	}
+	hashtest(input_file, output_file, hash6);
 	
-	fprintf(output_file, "\nlist elements of sort 2 (mul):, ");
+	output_file = fopen("rezult7.cvs", "w");
 	
-	for (i = 0; i < table -> size; ++i){
-		
-		fprintf(output_file, "%d ,", (table -> data[i]) -> size);
-		
-	}
-	
-	hash_table_delete(table);
-	
-	table = hash_table_create(PRIME_SIZE);
-	
-	rewind(input_file);
-	
-	while(fscanf(input_file, "%s", tempstr) > 0){
-		
-		hash_table_add(table, &tempstr, hash3);
-		++i;
-	}
-	
-	fprintf(output_file, "\nlist elements of sort 3 (XOR):, ");
-	
-	for (i = 0; i < table -> size; ++i){
-		
-		fprintf(output_file, "%d ,", (table -> data[i]) -> size);
-		
-	}
-	
-	hash_table_delete(table);
-	
-	table = hash_table_create(PRIME_SIZE);
-	
-	rewind(input_file);
-	
-	while(fscanf(input_file, "%s", tempstr) > 0){
-		
-		hash_table_add(table, &tempstr, hash4);
-		++i;
-	}
-	
-	fprintf(output_file, "\nlist elements of sort 4 (1):, ");
-	
-	for (i = 0; i < table -> size; ++i){
-		
-		fprintf(output_file, "%d ,", (table -> data[i]) -> size);
-		
-	}
-	
-	hash_table_delete(table);
-	
-	table = hash_table_create(PRIME_SIZE);
-	
-	rewind(input_file);
-	
-	while(fscanf(input_file, "%s", tempstr) > 0){
-		
-		printf("\n%d", hash5(&tempstr));
-		
-		hash_table_add(table, &tempstr, hash5);
-		++i;
-	}
-	
-	fprintf(output_file, "\nlist elements of sort 5 (first char):, ");
-	
-	for (i = 0; i < table -> size; ++i){
-		
-		fprintf(output_file, "%d ,", (table -> data[i]) -> size);
-		
-	}
-	
-	hash_table_delete(table);
-	
-	table = hash_table_create(PRIME_SIZE);
-	
-	rewind(input_file);
-	
-	while(fscanf(input_file, "%s", tempstr) > 0){
-		
-		hash_table_add(table, &tempstr, hash6);
-		++i;
-	}
-	
-	fprintf(output_file, "\nlist elements of sort 6 (len):, ");
-	
-	for (i = 0; i < table -> size; ++i){
-		
-		fprintf(output_file, "%d ,", (table -> data[i]) -> size);
-		
-	}
-	
-	hash_table_delete(table);
-	
-	return 0;
-	
-	
-	
-}
+	hashtest(input_file, output_file, hash7);
 
+	return 0;
+		
+}
+///###########################################################
 int hash1(char** str){
 	int i = 0;
 	int rezult = 1;
@@ -179,7 +79,7 @@ int hash1(char** str){
 	rezult = rezult % 100000;
 	return abs(rezult);
 }
-
+///###########################################################
 int hash2(char** str){
 	int i = 0;
 	int rezult = 1;
@@ -194,7 +94,7 @@ int hash2(char** str){
 	rezult = rezult % 100000;
 	return abs(rezult);
 }
-
+///###########################################################
 int hash3(char** str){
 	int i = 0;
 	int rezult = 0;
@@ -208,15 +108,72 @@ int hash3(char** str){
 	
 	return abs(rezult);
 }
-
+///###########################################################
 int hash4(char** str){
 	return 1;
 }
-
+///###########################################################
 int hash5(char** str){
 	return abs((*str)[0]);
 }
-
+///###########################################################
 int hash6(char** str){
 	return abs(strlen(*str));
 }
+///###########################################################
+int hash7(char** str){
+
+    int hash = 0;
+    
+    int i = 0;
+    
+	int max = strlen(*str);
+	
+	if (str != NULL) hash = (*str)[0];
+	
+	for(i = 1; i < max; ++i){
+		hash += (unsigned char) (*str)[i];
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+	}
+
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+
+    return abs(hash);
+
+}
+///###########################################################
+
+int hashtest(FILE* input_file, FILE* output_file, int (*hash) (char** str)){
+	hash_table* table = 0;
+	int i = 0;
+	char* tempstr = (char*) calloc (100, sizeof(char));
+	
+	
+	table = hash_table_create(PRIME_SIZE);
+	rewind(input_file);
+	
+	fprintf(output_file, "list number , list elements of sort \n");
+
+	while(fscanf(input_file, "%s", tempstr) > 0){
+
+		if (!(hash_table_find(table, hash, &tempstr)))
+			hash_table_add(table, &tempstr, hash);
+
+	}
+
+	
+	
+	for (i = 0; i < table -> size; ++i){
+		
+		
+		fprintf(output_file, "%d , %d \n", i,  (table -> data[i]) -> size);
+		
+	}
+	hash_table_delete(table);
+}
+
+
+"%[^\"]"

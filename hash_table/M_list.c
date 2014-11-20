@@ -188,9 +188,9 @@ list_elem* find_elem(list* lst, elem_t* found_elem, int (*cmp) (elem_t, elem_t)\
 			if (current_elem -> next == NULL) {
 				current_elem = lst -> tail;
 			}
-			
-			current_elem = current_elem -> next;
-			
+			else{
+				current_elem = current_elem -> next;
+			}
 		}
 	}
 	
@@ -217,7 +217,7 @@ list_elem* find_elem(list* lst, elem_t* found_elem, int (*cmp) (elem_t, elem_t)\
 	
 int list_valide(list* lst){
 	
-#ifndef DEBUG
+#ifndef LIST_DEBUG
 
 return 1;
 

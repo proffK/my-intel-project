@@ -1,7 +1,7 @@
 #ifndef _M_LIST_
 #define _M_LIST_
 
-//#define DEBUG
+//#define LIST_DEBUG
 
 typedef char* elem_t;
 
